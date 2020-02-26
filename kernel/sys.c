@@ -49,6 +49,8 @@
 #include <linux/binfmts.h>
 
 #include <linux/sched.h>
+#include <uapi/linux/sched.h>
+
 #include <linux/rcupdate.h>
 #include <linux/uidgid.h>
 #include <linux/cred.h>
@@ -2089,9 +2091,9 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	struct task_struct *me = current, *who;
 	unsigned char comm[sizeof(me->comm)];
 	long error;
-	unsigned int next = 0;
+	unsigned int next = 0, rc;
 	pid_t pid;
-
+	
 	error = security_task_prctl(option, arg2, arg3, arg4, arg5);
 	if (error != -ENOSYS)
 		return error;
@@ -2148,20 +2150,20 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		switch (arg2)
 			{
 			case PR_SET_VTF:
-				if ((arg3 < 0) || (arg3 > 1))
-				{
-					error = -EINVAL;
-					break;
-				}
 				rcu_read_lock();
-				pid = arg4;
+				pid = arg3;
 				printk("int:%d - arg3:%d\n", pid, arg3);
 				who = find_process_by_pid(pid);
 				if (who)
 				{
 					printk("who!!\n");
-					who->to_be_tracked = arg3;//arg3
-					printk("PR_SET_VTF pid : %ld, to_be_tracked : %d\n", arg4, who->to_be_tracked);
+					const struct sched_param sp = {
+						.sched_priority = who->normal_prio,
+					};
+					rc = sched_setscheduler(who, SCHED_VTF, &sp);
+					if(!rc)
+						printk("New policy : %d\n", who->policy);
+					printk("sched_setscheduler returned : %d\n", rc);
 				}
 				else
 					printk("not who!!\n");

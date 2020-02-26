@@ -1460,7 +1460,7 @@ struct task_struct {
 	struct task_rss_stat	rss_stat;
 #endif
 /* task state */
-	unsigned int to_be_tracked:1;
+	//unsigned int to_be_tracked:1;
 	int exit_state;
 	int exit_code, exit_signal;
 	int pdeath_signal;  /*  The signal sent when the parent dies  */

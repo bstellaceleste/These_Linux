@@ -90,7 +90,12 @@ static inline int idle_policy(int policy)
 }
 static inline int fair_policy(int policy)
 {
-	return policy == SCHED_NORMAL || policy == SCHED_BATCH;
+	return policy == SCHED_NORMAL || policy == SCHED_BATCH || policy == SCHED_VTF;
+}
+
+static inline int vtf_policy(int policy)
+{
+	return policy == SCHED_VTF;
 }
 
 static inline int rt_policy(int policy)
@@ -116,6 +121,11 @@ static inline int task_has_rt_policy(struct task_struct *p)
 static inline int task_has_dl_policy(struct task_struct *p)
 {
 	return dl_policy(p->policy);
+}
+
+static inline int task_has_vtf_policy(struct task_struct *p)
+{
+	return vtf_policy(p->policy);
 }
 
 /*

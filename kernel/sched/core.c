@@ -2730,6 +2730,8 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	switch_to(prev, next, prev);
 	barrier();
 
+	if(task_has_vtf_policy(next))//next->policy == 7
+		printk("Task next has vtf_policy : %d\n", next->policy);
 	/* Inform the hypervisor about the processes scheduled in and out */
 	/*vtf.index = prev->pid;
 	vtf.value = next->pid;
@@ -3829,6 +3831,8 @@ static int __sched_setscheduler(struct task_struct *p,
 	struct rq *rq;
 	int reset_on_fork;
 
+	printk("__sched_setscheduler - policy = %d\n", attr->sched_policy);
+
 	/* may grab non-irq protected spin_locks */
 	BUG_ON(in_interrupt());
 recheck:
@@ -3842,6 +3846,7 @@ recheck:
 		if (!valid_policy(policy))
 			return -EINVAL;
 	}
+	printk("_sched_setscheduler : have we reached here?\n");
 
 	if (attr->sched_flags & ~(SCHED_FLAG_RESET_ON_FORK))
 		return -EINVAL;
@@ -4072,7 +4077,7 @@ static int _sched_setscheduler(struct task_struct *p, int policy,
 		policy &= ~SCHED_RESET_ON_FORK;
 		attr.sched_policy = policy;
 	}
-
+	printk("_sched_setscheduler - policy = %d\n", attr.sched_policy);
 	return __sched_setscheduler(p, &attr, check, true);
 }
 /**
@@ -4087,7 +4092,7 @@ static int _sched_setscheduler(struct task_struct *p, int policy,
  */
 int sched_setscheduler(struct task_struct *p, int policy,
 		       const struct sched_param *param)
-{
+{printk("sched_setscheduler - policy = %d\n", policy);
 	return _sched_setscheduler(p, policy, param, true);
 }
 EXPORT_SYMBOL_GPL(sched_setscheduler);
@@ -4847,6 +4852,7 @@ SYSCALL_DEFINE1(sched_get_priority_max, int, policy)
 	case SCHED_DEADLINE:
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
+	case SCHED_VTF:
 	case SCHED_IDLE:
 		ret = 0;
 		break;
@@ -4874,6 +4880,7 @@ SYSCALL_DEFINE1(sched_get_priority_min, int, policy)
 	case SCHED_DEADLINE:
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
+	case SCHED_VTF:
 	case SCHED_IDLE:
 		ret = 0;
 	}
