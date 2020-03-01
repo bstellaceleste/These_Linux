@@ -53,7 +53,7 @@
                                                    process timing */
 
 #define PR_SET_NAME    15		/* Set process name */
-# define PR_SET_VTF  1  /* Second arg is 1 to set to process as to be tracked */
+//# define PR_SET_VTF  1  /* Second arg is 1 to set to process as to be tracked */
 #define PR_GET_NAME    16		/* Get process name */
 
 /* Get/set process endian */

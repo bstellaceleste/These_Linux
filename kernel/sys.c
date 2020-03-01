@@ -2088,11 +2088,11 @@ static struct task_struct *find_process_by_pid(pid_t pid)
 SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		unsigned long, arg4, unsigned long, arg5)
 {
-	struct task_struct *me = current, *who;
+	//struct task_struct *me = current, *who;
 	unsigned char comm[sizeof(me->comm)];
 	long error;
-	unsigned int next = 0, rc;
-	pid_t pid;
+	/*unsigned int next = 0, rc;
+	pid_t pid;*/
 	
 	error = security_task_prctl(option, arg2, arg3, arg4, arg5);
 	if (error != -ENOSYS)
@@ -2147,7 +2147,7 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 			error = -EINVAL;
 		break;
 	case PR_SET_NAME:
-		switch (arg2)
+		/*switch (arg2)
 			{
 			case PR_SET_VTF:
 				rcu_read_lock();
@@ -2172,14 +2172,14 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 				break;
 			}
 		if (!next) //if we switched to arg2 and did something already, the syscall was not to set name so just continue
-		{
+		{*/
 			comm[sizeof(me->comm) - 1] = 0;
 			if (strncpy_from_user(comm, (char __user *)arg2,
 								  sizeof(me->comm) - 1) < 0)
 				return -EFAULT;
 			set_task_comm(me, comm);
 			proc_comm_connector(me);
-		}
+		//}
 		break;
 	case PR_GET_NAME:
 		get_task_comm(comm, me);
